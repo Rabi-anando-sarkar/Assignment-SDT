@@ -6,8 +6,10 @@ import generateToken from '../utils/TokenHandler.js'
 
 // Register User : Done
 const register = asyncHandler( async (req,res) => {
+
     const { username, password } = req.body
 
+    // check if any field is empty
     if(
         [username,password].some((field) => field?.trim() === '')
     ) {
@@ -17,6 +19,7 @@ const register = asyncHandler( async (req,res) => {
         )
     }
 
+    // check if the user already exists
     const existedUser = await User.findOne({
         $or: [{username}]
     })
@@ -28,10 +31,14 @@ const register = asyncHandler( async (req,res) => {
         )
     }
 
+    // create the new user and in lowercase 
+
     const user = await User.create({
         username: username.toLowerCase(),
         password
     })
+
+    // storing user name in a varibale for later fetching
 
     const createdUser = await User.findById(user._id).select(
         "-password"
@@ -44,6 +51,7 @@ const register = asyncHandler( async (req,res) => {
         )
     }
 
+    // send the response
     return res
             .status(201)
             .json(
@@ -60,6 +68,7 @@ const register = asyncHandler( async (req,res) => {
 const login = asyncHandler ( async (req,res) => {
     const { username, password } = req.body
 
+    // check if credentials are correct
     if(!username) {
         throw new ApiError(
             400,
@@ -67,6 +76,7 @@ const login = asyncHandler ( async (req,res) => {
         )
     }
 
+    // if user does not exist
     const user = await User.findOne({username})
 
     if(!user) {
@@ -75,6 +85,8 @@ const login = asyncHandler ( async (req,res) => {
             "User Does not exist"
         )
     }
+
+    // validating password
 
     const isPasswordValid = await user.isPasswordCorrect(password)
 
@@ -85,8 +97,10 @@ const login = asyncHandler ( async (req,res) => {
         )
     }
 
+    // saving logged in user in a variable
     const loggedInUser = await User.findById(user._id).select("-password")
 
+    // generating token
     const token = generateToken(user)
 
     if(!token) {
@@ -96,9 +110,9 @@ const login = asyncHandler ( async (req,res) => {
         )
     }
 
-    console.log(token);
-    
+    console.log(token);    
 
+    // return response
     return res
             .status(200)
             .json(

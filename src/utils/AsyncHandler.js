@@ -1,3 +1,5 @@
+// Custom Async handler (higher order fucntion)
+
 const asyncHandler = (requestHandlerFunction) => async (req,res,next) => {
     try {
         await requestHandlerFunction(req,res,next)

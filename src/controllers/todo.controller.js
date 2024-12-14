@@ -6,6 +6,8 @@ import { Task } from "../models/task.model.js";
 // Create Task : Done
 const createTasks = asyncHandler( async (req,res) => {
     const { title, description } = req.body;
+
+    // create new task
     const task = new Task({
         title,
         description
@@ -18,8 +20,10 @@ const createTasks = asyncHandler( async (req,res) => {
         )
     }
 
+    // save the task to db
     await task.save()
 
+    // return response
     return res.status(201).json(
         new ApiResponse(
             200,
@@ -30,6 +34,7 @@ const createTasks = asyncHandler( async (req,res) => {
 
 // Read Task : Done
 const readTasks = asyncHandler( async (req,res) => {
+    // find task from db
     const tasks = await Task.find()
     
     if(!tasks) {
@@ -39,6 +44,7 @@ const readTasks = asyncHandler( async (req,res) => {
         )
     }
 
+    // return response
     return res.status(201).json(
         new ApiResponse(
             200,
@@ -51,12 +57,16 @@ const readTasks = asyncHandler( async (req,res) => {
 // Update Task : Done
 const updateTasks = asyncHandler( async (req,res) => {
     const { status } = req.body;
+
+    // check validations    
     if(!['pending', 'in-progress', 'completed'].includes(status)) {
         throw new ApiError(
             400,
             'Invalid Status'
         )
     }
+
+    // finding the task by id from url(params) and updating it 
 
     const task = await Task.findByIdAndUpdate(req.params.id, {status},{ new:true})
 
@@ -67,6 +77,7 @@ const updateTasks = asyncHandler( async (req,res) => {
         )
     }
 
+    // return response
     return res
             .status(202)
             .json(
@@ -79,8 +90,8 @@ const updateTasks = asyncHandler( async (req,res) => {
 })
 
 // Delete Task : Done
-
 const deleteTasks = asyncHandler( async (req,res) => {
+    // finding the task by id from url(params) and deleting it 
     const task = await Task.findByIdAndDelete(req.params.id)
 
     if(!task) {
@@ -90,6 +101,7 @@ const deleteTasks = asyncHandler( async (req,res) => {
         )
     }
 
+    // return response
     return res
             .status(200)
             .json(

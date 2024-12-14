@@ -1,3 +1,5 @@
+// generating json web token
+
 import jwt from 'jsonwebtoken'
 
 const generateToken = (user) => {
